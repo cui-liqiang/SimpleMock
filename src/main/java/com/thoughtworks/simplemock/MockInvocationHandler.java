@@ -1,5 +1,7 @@
 package com.thoughtworks.simplemock;
 
+import com.thoughtworks.simplemock.answers.Answer;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,7 +22,7 @@ public class MockInvocationHandler implements InvocationHandler {
         primitiveDefaultValue.put(double.class, 0d);
     }
 
-    private Map<Invocation, Object> invocationReturnValueMap = new HashMap<Invocation, Object>();
+    private Map<Invocation, Answer> invocationReturnValueMap = new HashMap<Invocation, Answer>();
 
     private MockProcess mockProcess = new MockProcess();
     private Map<Invocation, Integer> invocationTimesMap = new HashMap<Invocation, Integer>();
@@ -35,10 +37,10 @@ public class MockInvocationHandler implements InvocationHandler {
         if(mockProcess.onVerifying()) {
             verifyInvocation(invocation);
         } else {
-            Object returnVal = invocationReturnValueMap.get(invocation);
+            Answer returnVal = invocationReturnValueMap.get(invocation);
             if (returnVal != null) {
                 recordInvocations(invocation);
-                return returnVal;
+                return returnVal.answer();
             }
             OngoingStubbing ongoingStubbing = new OngoingStubbing(invocation, invocationReturnValueMap);
             mockProcess.setCurrentOngoingStubbing(ongoingStubbing);
