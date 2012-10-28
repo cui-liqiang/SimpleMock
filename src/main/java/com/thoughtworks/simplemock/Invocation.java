@@ -32,4 +32,9 @@ public class Invocation {
         result = 31 * result + (objects != null ? Arrays.hashCode(objects) : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return method.toString();
+    }
 }

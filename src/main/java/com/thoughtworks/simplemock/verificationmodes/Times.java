@@ -18,7 +18,7 @@ public class Times implements MockVerificationMode {
             Invocation invocation = data.getInvocation();
             throw new WrongInvocationTimesException("Wrong invocation times:\n" +
                     "expected invoke " + invocation + " " + times + " times,\n" +
-                    "but " + data.getInvocationTimes() + " times");
+                    "but actually " + data.getInvocationTimes() + " times");
         }
     }
 }
