@@ -5,7 +5,9 @@ import com.thoughtworks.simplemock.answers.Answer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MockInvocationHandler implements InvocationHandler {
@@ -22,30 +24,35 @@ public class MockInvocationHandler implements InvocationHandler {
         primitiveDefaultValue.put(double.class, 0d);
     }
 
-    private Map<Invocation, Answer> invocationReturnValueMap = new HashMap<Invocation, Answer>();
+    private List<Invocation> storedInvocations = new ArrayList<Invocation>();
 
-    private MockProcess mockProcess = new MockProcess();
+    private MockProcess mockProcess = MockProcess.mockProcess();
     private Map<Invocation, Integer> invocationTimesMap = new HashMap<Invocation, Integer>();
-
-    public MockInvocationHandler(MockProcess mockProcess) {
-        this.mockProcess = mockProcess;
-    }
 
     @Override
     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-        Invocation invocation = new Invocation(method, objects);
+        Invocation invocation = new Invocation(method, objects, mockProcess.getAllMatchers());
         if(mockProcess.onVerifying()) {
             verifyInvocation(invocation);
         } else {
-            Answer returnVal = invocationReturnValueMap.get(invocation);
-            if (returnVal != null) {
+            Answer answer = getAnswerFromInvocation(invocation);
+            if (answer != null) {
                 recordInvocations(invocation);
-                return returnVal.answer();
+                return answer.answer();
             }
-            OngoingStubbing ongoingStubbing = new OngoingStubbing(invocation, invocationReturnValueMap);
+            OngoingStubbing ongoingStubbing = new OngoingStubbing(invocation, storedInvocations);
             mockProcess.setCurrentOngoingStubbing(ongoingStubbing);
         }
         return defaultValueFor(method);
+    }
+
+    private Answer getAnswerFromInvocation(Invocation invocation) {
+        for (Invocation storeInvocation : storedInvocations) {
+            if(storeInvocation.equals(invocation)) {
+                return storeInvocation.getAnswer();
+            }
+        }
+        return null;
     }
 
     private void recordInvocations(Invocation invocation) {

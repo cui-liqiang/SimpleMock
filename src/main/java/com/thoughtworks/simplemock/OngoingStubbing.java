@@ -2,28 +2,31 @@ package com.thoughtworks.simplemock;
 
 import com.thoughtworks.simplemock.answers.Answer;
 
+import java.util.List;
 import java.util.Map;
 
 public class OngoingStubbing {
     private final Invocation invocation;
-    private final Map<Invocation, Answer> invocationReturnValueMap;
+    private final List<Invocation> invocations;
 
-    public OngoingStubbing(Invocation invocation, Map<Invocation, Answer> invocationReturnValueMap) {
+    public OngoingStubbing(Invocation invocation, List<Invocation> invocations) {
         this.invocation = invocation;
-        this.invocationReturnValueMap = invocationReturnValueMap;
+        this.invocations = invocations;
     }
 
     public void thenReturn(final Object value) {
-        this.invocationReturnValueMap.put(this.invocation, new Answer() {
+        Answer answer = new Answer() {
             @Override
             public Object answer() {
                 return value;
             }
-        });
+        };
+        thenReturn(answer);
     }
 
     public void thenReturn(Answer answer) {
-        this.invocationReturnValueMap.put(this.invocation, answer);
+        invocation.setAnswer(answer);
+        this.invocations.add(this.invocation);
     }
 
 }

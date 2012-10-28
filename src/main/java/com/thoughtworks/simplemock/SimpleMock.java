@@ -5,10 +5,10 @@ import com.thoughtworks.simplemock.verificationmodes.Times;
 import java.lang.reflect.Proxy;
 
 public class SimpleMock {
-    private static MockProcess mockProcess = new MockProcess();
+    private static MockProcess mockProcess = MockProcess.mockProcess();
 
     public static <T> T mock(Class<T> interfaze) {
-        return (T) Proxy.newProxyInstance(SimpleMock.class.getClassLoader(), new Class[]{interfaze}, new MockInvocationHandler(mockProcess));
+        return (T) Proxy.newProxyInstance(SimpleMock.class.getClassLoader(), new Class[]{interfaze}, new MockInvocationHandler());
     }
 
     public static <T> OngoingStubbing when(T whatEver) {
