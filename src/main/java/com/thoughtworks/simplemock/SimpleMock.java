@@ -1,5 +1,7 @@
 package com.thoughtworks.simplemock;
 
+import com.thoughtworks.simplemock.verificationmodes.Times;
+
 import java.lang.reflect.Proxy;
 
 public class SimpleMock {
@@ -12,4 +14,12 @@ public class SimpleMock {
     public static <T> OngoingStubbing when(T whatEver) {
         return mockProcess.getCurrentOngoingStubbing();
     }
+
+    public static <T> T verify(T mock) {
+        MockVerificationMode times = new Times(1);
+        MockVerification mockVerification = new MockVerification(times);
+        mockProcess.startVerify(mockVerification);
+        return mock;
+    }
+
 }
